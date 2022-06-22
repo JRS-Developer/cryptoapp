@@ -1,7 +1,5 @@
-import React from "react";
-
 const Exchanges = () => {
-  return <div>Exchanges</div>;
+  return <h1>Exchanges</h1>;
 };
 
 export default Exchanges;
