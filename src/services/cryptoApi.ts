@@ -4,11 +4,13 @@ import {
   fetchBaseQuery,
 } from "@reduxjs/toolkit/query/react";
 import type { GetCryptoResponse } from "../types";
+const { VITE_RAPID_API_KEY: API_KEY, VITE_RAPID_API_COINR_HOST: API_HOST } =
+  import.meta.env;
 
 const baseUrl = "https://coinranking1.p.rapidapi.com";
 const headers = {
-  "X-RapidAPI-Key": "1507a2c8b4msh46eeba1afb45bb0p17841bjsna51bf80112b5",
-  "X-RapidAPI-Host": "coinranking1.p.rapidapi.com",
+  "X-RapidAPI-Key": API_KEY,
+  "X-RapidAPI-Host": API_HOST,
 };
 
 const createRequest = (url: string): FetchArgs => {
@@ -21,8 +23,8 @@ export const cryptoApi = createApi({
     baseUrl,
   }),
   endpoints: (build) => ({
-    getCryptos: build.query<GetCryptoResponse, void>({
-      query: () => createRequest("/coins"),
+    getCryptos: build.query<GetCryptoResponse, number>({
+      query: (count: number) => createRequest(`/coins`),
     }),
   }),
 });
