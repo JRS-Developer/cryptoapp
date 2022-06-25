@@ -1,6 +1,8 @@
 import { Select, Typography, Col, Row, Avatar, Card } from "antd";
 import { useGetCryptoNewsQuery } from "../../services/cryptoNewsApi";
 import { formatDistanceToNow } from "date-fns";
+import { useState } from "react";
+import { useGetCryptosQuery } from "../../services/cryptoApi";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -12,19 +14,43 @@ type Props = {
 };
 
 const News = ({ simplified = false }: Props) => {
-  const count = simplified ? 10 : 100;
-  const { data: cryptoNews } = useGetCryptoNewsQuery({
-    count,
-    newsCategory: "cryptocurrency",
+  const defaultCategory = "Cryptocurrency";
+  const [newsCategory, setNewsCategory] = useState(defaultCategory);
+  const { data: cryptoNews, isLoading: isLoadingNews } = useGetCryptoNewsQuery({
+    count: simplified ? 6 : 12,
+    newsCategory: newsCategory,
   });
+  const { data: coins, isLoading: isLoadingCoins } = useGetCryptosQuery(100);
 
-  if (!cryptoNews) return <Text>Loading...</Text>;
-  console.log(cryptoNews.value);
+  if (isLoadingNews) return <Text>Loading...</Text>;
 
   return (
     <>
       <Row gutter={[24, 24]}>
-        {cryptoNews.value.map((news, i) => (
+        {!simplified && (
+          <Col span={24}>
+            <Select
+              showSearch
+              className="select-news"
+              placeholder="Select a Crypto"
+              optionFilterProp="children"
+              defaultValue={defaultCategory}
+              loading={isLoadingCoins}
+              onChange={(value) => setNewsCategory(value)}
+              filterOption={(input, option) =>
+                (option!.children as unknown as string)
+                  .toLowerCase()
+                  .indexOf(input.toLowerCase()) >= 0
+              }
+            >
+              <Option value="Cryptocurency">Cryptocurrency</Option>
+              {coins?.data?.coins?.map((currency) => (
+                <Option value={currency.name}>{currency.name}</Option>
+              ))}
+            </Select>
+          </Col>
+        )}
+        {cryptoNews?.value.map((news, i) => (
           <Col xs={24} sm={12} lg={8} key={i}>
             <Card hoverable className="news-card">
               <a href={news.url} target="_blank" rel="noreferrer">
