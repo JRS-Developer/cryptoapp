@@ -3,7 +3,13 @@ import {
   FetchArgs,
   fetchBaseQuery,
 } from "@reduxjs/toolkit/query/react";
-import type { GetCryptoResponse } from "../types";
+import type {
+  CoinId,
+  GetCryptoDetailsResponse,
+  GetCryptoHistoryArgs,
+  GetCryptoHistoryResponse,
+  GetCryptosResponse,
+} from "../types";
 const { VITE_RAPID_API_KEY: API_KEY, VITE_RAPID_API_COINR_HOST: API_HOST } =
   import.meta.env;
 
@@ -23,10 +29,24 @@ export const cryptoApi = createApi({
     baseUrl,
   }),
   endpoints: (build) => ({
-    getCryptos: build.query<GetCryptoResponse, number>({
-      query: (count: number) => createRequest(`/coins`),
+    getCryptos: build.query<GetCryptosResponse, number>({
+      query: (count) => createRequest(`/coins?limit=${count}`),
+    }),
+    getCryptoDetails: build.query<GetCryptoDetailsResponse, CoinId>({
+      query: (coinId) => createRequest(`/coin/${coinId}`),
+    }),
+    getCryptoHistory: build.query<
+      GetCryptoHistoryResponse,
+      GetCryptoHistoryArgs
+    >({
+      query: ({ coinId, timePeriod }) =>
+        createRequest(`/coin/${coinId}/history?timePeriod=${timePeriod}`),
     }),
   }),
 });
 
-export const { useGetCryptosQuery } = cryptoApi;
+export const {
+  useGetCryptosQuery,
+  useGetCryptoDetailsQuery,
+  useGetCryptoHistoryQuery,
+} = cryptoApi;
