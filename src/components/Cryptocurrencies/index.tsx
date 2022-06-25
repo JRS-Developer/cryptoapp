@@ -10,7 +10,7 @@ type Props = {
 
 const Cryptocurrencies = ({ simplified = false }: Props) => {
   const count = simplified ? 10 : 100;
-  const { data: cryptosList } = useGetCryptosQuery(count);
+  const { data: cryptosList, isLoading } = useGetCryptosQuery(count);
   const [cryptos, setCryptos] = useState(cryptosList?.data.coins || []);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -26,6 +26,8 @@ const Cryptocurrencies = ({ simplified = false }: Props) => {
 
     setCryptos(filteredData);
   }, [cryptosList, searchTerm]);
+
+  if (isLoading) return <p>Loading...</p>;
 
   return (
     <>
