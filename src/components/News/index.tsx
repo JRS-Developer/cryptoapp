@@ -45,13 +45,15 @@ const News = ({ simplified = false }: Props) => {
             >
               <Option value="Cryptocurency">Cryptocurrency</Option>
               {coins?.data?.coins?.map((currency) => (
-                <Option value={currency.name}>{currency.name}</Option>
+                <Option key={currency.name} value={currency.name}>
+                  {currency.name}
+                </Option>
               ))}
             </Select>
           </Col>
         )}
-        {cryptoNews?.value.map((news, i) => (
-          <Col xs={24} sm={12} lg={8} key={i}>
+        {cryptoNews?.value.map((news) => (
+          <Col xs={24} sm={12} lg={8} key={news.name}>
             <Card hoverable className="news-card">
               <a href={news.url} target="_blank" rel="noreferrer">
                 <div className="news-image-container">
