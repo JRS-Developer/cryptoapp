@@ -7,6 +7,11 @@ export const store = configureStore({
     [cryptoApi.reducerPath]: cryptoApi.reducer,
     [cryptoNewApi.reducerPath]: cryptoNewApi.reducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(
+      cryptoApi.middleware,
+      cryptoNewApi.middleware
+    ),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
