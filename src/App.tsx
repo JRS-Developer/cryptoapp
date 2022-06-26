@@ -13,12 +13,12 @@ const App = () => {
   return (
     <>
       <div className="app">
-        <div className="navbar">
+        <header className="navbar">
           <Navbar />
-        </div>
+        </header>
         <div className="main">
           <Layout>
-            <div className="routes">
+            <main className="routes">
               <Routes>
                 <Route path="/">
                   <Route index element={<Homepage />} />
@@ -31,9 +31,9 @@ const App = () => {
                   <Route path="news" element={<News />} />
                 </Route>
               </Routes>
-            </div>
+            </main>
           </Layout>
-          <div className="footer">
+          <footer className="footer">
             <Typography.Title
               level={5}
               style={{
@@ -49,7 +49,7 @@ const App = () => {
               <Link to="/exchanges">Exchanges</Link>
               <Link to="/news">News</Link>
             </Space>
-          </div>
+          </footer>
         </div>
       </div>
     </>
