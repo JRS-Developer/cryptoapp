@@ -1,4 +1,4 @@
-import { Select, Typography, Col, Row, Avatar, Card } from "antd";
+import { Select, Typography, Col, Row, Avatar, Card, Skeleton } from "antd";
 import { useGetCryptoNewsQuery } from "../../services/cryptoNewsApi";
 import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
@@ -8,6 +8,24 @@ const { Title, Text } = Typography;
 const { Option } = Select;
 const demoImage =
   "https://www.bing.com/th?id=OVFT.mpzuVZnv8dwIMRfQGPbOPC&pid=News";
+
+type SkeletonProps = {
+  nItems?: number;
+};
+
+const LoadingSkeleton = ({ nItems = 6 }: SkeletonProps) => {
+  return (
+    <>
+      {Array(nItems)
+        .fill(undefined)
+        .map((_, index) => (
+          <Col xs={24} sm={12} lg={8} key={index + "skeleton news"}>
+            <Skeleton active />
+          </Col>
+        ))}
+    </>
+  );
+};
 
 type Props = {
   simplified?: boolean;
@@ -21,8 +39,6 @@ const News = ({ simplified = false }: Props) => {
     newsCategory: newsCategory,
   });
   const { data: coins, isLoading: isLoadingCoins } = useGetCryptosQuery(100);
-
-  if (isLoadingNews) return <Text>Loading...</Text>;
 
   return (
     <>
@@ -52,47 +68,51 @@ const News = ({ simplified = false }: Props) => {
             </Select>
           </Col>
         )}
-        {cryptoNews?.value.map((news) => (
-          <Col xs={24} sm={12} lg={8} key={news.name}>
-            <Card hoverable className="news-card">
-              <a href={news.url} target="_blank" rel="noreferrer">
-                <div className="news-image-container">
-                  <Title className="news-title" level={4}>
-                    {news.name}
-                  </Title>
-                  <img
-                    src={news?.image?.thumbnail?.contentUrl || demoImage}
-                    alt={news?.name}
-                  />
-                </div>
-                <p>
-                  {news.description.length > 100
-                    ? `${news.description.substring(0, 100)}...`
-                    : news.description}
-                </p>
-                <div className="provider-container">
-                  <div>
-                    <Avatar
-                      src={
-                        news.provider[0]?.image?.thumbnail?.contentUrl ||
-                        demoImage
-                      }
-                      alt={news.provider[0]?.name}
+        {isLoadingNews ? (
+          <LoadingSkeleton />
+        ) : (
+          cryptoNews?.value.map((news) => (
+            <Col xs={24} sm={12} lg={8} key={news.name}>
+              <Card hoverable className="news-card">
+                <a href={news.url} target="_blank" rel="noreferrer">
+                  <div className="news-image-container">
+                    <Title className="news-title" level={4}>
+                      {news.name}
+                    </Title>
+                    <img
+                      src={news?.image?.thumbnail?.contentUrl || demoImage}
+                      alt={news?.name}
                     />
-                    <Text className="provider-name">
-                      {news.provider[0]?.name}
+                  </div>
+                  <p>
+                    {news.description.length > 100
+                      ? `${news.description.substring(0, 100)}...`
+                      : news.description}
+                  </p>
+                  <div className="provider-container">
+                    <div>
+                      <Avatar
+                        src={
+                          news.provider[0]?.image?.thumbnail?.contentUrl ||
+                          demoImage
+                        }
+                        alt={news.provider[0]?.name}
+                      />
+                      <Text className="provider-name">
+                        {news.provider[0]?.name}
+                      </Text>
+                    </div>
+                    <Text>
+                      {formatDistanceToNow(Date.parse(news.datePublished), {
+                        addSuffix: true,
+                      })}
                     </Text>
                   </div>
-                  <Text>
-                    {formatDistanceToNow(Date.parse(news.datePublished), {
-                      addSuffix: true,
-                    })}
-                  </Text>
-                </div>
-              </a>
-            </Card>
-          </Col>
-        ))}
+                </a>
+              </Card>
+            </Col>
+          ))
+        )}
       </Row>
     </>
   );

@@ -4,13 +4,41 @@ import { useGetCryptosQuery } from "../../services/cryptoApi";
 import { prettyNumber } from "../../utils/numbers";
 import Cryptocurrencies from "../Cryptocurrencies";
 import News from "../News";
+import { Stats } from "../../types";
 
 const { Title } = Typography;
 
+interface StatisticI {
+  title: string;
+  value: keyof Stats;
+}
+
+const statistics: StatisticI[] = [
+  {
+    title: "Cryptocurrencies",
+    value: "total",
+  },
+  {
+    title: "Exchanges",
+    value: "totalExchanges",
+  },
+  {
+    title: "Market Cap",
+    value: "totalMarketCap",
+  },
+  {
+    title: "24h Volume",
+    value: "total24hVolume",
+  },
+  {
+    title: "Markets",
+    value: "totalMarkets",
+  },
+];
+
 const Homepage = () => {
-  const { data } = useGetCryptosQuery(10);
+  const { data, isLoading } = useGetCryptosQuery(10);
   const stats = data?.data?.stats;
-  const coins = data?.data?.coins;
 
   return (
     <>
@@ -18,36 +46,15 @@ const Homepage = () => {
         Global Crypto Stats
       </Title>
       <Row>
-        <Col span={12}>
-          <Statistic
-            title="Total Cryptocurrencies"
-            value={prettyNumber(stats?.total)}
-          />
-        </Col>
-        <Col span={12}>
-          <Statistic
-            title="Total Exchanges"
-            value={prettyNumber(stats?.totalExchanges)}
-          />
-        </Col>
-        <Col span={12}>
-          <Statistic
-            title="Total Market Cap"
-            value={prettyNumber(stats?.totalMarketCap)}
-          />
-        </Col>
-        <Col span={12}>
-          <Statistic
-            title="Total 24h Volume"
-            value={prettyNumber(stats?.total24hVolume)}
-          />
-        </Col>
-        <Col span={12}>
-          <Statistic
-            title="Total Markets"
-            value={prettyNumber(stats?.totalMarkets)}
-          />
-        </Col>
+        {statistics.map((stat) => (
+          <Col span={12}>
+            <Statistic
+              title={`Total ${stat.title}`}
+              value={prettyNumber(stats ? stats[stat.value] : undefined)}
+              loading={isLoading}
+            />
+          </Col>
+        ))}
       </Row>
       <div className="home-heading-container">
         <Title level={2} className="home-title">

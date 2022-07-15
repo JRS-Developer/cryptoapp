@@ -1,8 +1,28 @@
-import { Card, Row, Col, Input } from "antd";
+import { Card, Row, Col, Input, Skeleton, Typography } from "antd";
 import { Link } from "react-router-dom";
 import { useGetCryptosQuery } from "../../services/cryptoApi";
 import React, { useEffect, useState } from "react";
 import { prettyNumber } from "../../utils/numbers";
+
+const { Paragraph, Text } = Typography;
+
+type SkeletonProps = {
+  nItems?: number;
+};
+
+const LoadingSkeleton = ({ nItems = 10 }: SkeletonProps): JSX.Element => {
+  return (
+    <>
+      {Array(nItems)
+        .fill(undefined)
+        .map((_, index) => (
+          <Col key={index + "skeleton crypto"} xs={24} sm={12} lg={6}>
+            <Skeleton active />
+          </Col>
+        ))}
+    </>
+  );
+};
 
 type Props = {
   simplified?: boolean;
@@ -10,7 +30,7 @@ type Props = {
 
 const Cryptocurrencies = ({ simplified = false }: Props) => {
   const count = simplified ? 10 : 100;
-  const { data: cryptosList, isLoading } = useGetCryptosQuery(count);
+  const { data: cryptosList, isFetching } = useGetCryptosQuery(count);
   const [cryptos, setCryptos] = useState(cryptosList?.data.coins || []);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -27,8 +47,6 @@ const Cryptocurrencies = ({ simplified = false }: Props) => {
     setCryptos(filteredData);
   }, [cryptosList, searchTerm]);
 
-  if (isLoading) return <p>Loading...</p>;
-
   return (
     <>
       {simplified === false && (
@@ -40,27 +58,40 @@ const Cryptocurrencies = ({ simplified = false }: Props) => {
         </div>
       )}
       <Row gutter={[32, 32]} className="crypto-card-contaiuner">
-        {cryptos?.map((currency) => (
-          <Col
-            xs={24}
-            sm={12}
-            lg={6}
-            className="crypto-card"
-            key={currency.uuid}
-          >
-            <Link to={`/crypto/${currency.uuid}`}>
-              <Card
-                title={`${currency.rank}. ${currency.name}`}
-                hoverable
-                extra={<img className="crypto-image" src={currency.iconUrl} />}
-              >
-                <p>Price: {prettyNumber(currency.price)}$</p>
-                <p>Market Cap: {prettyNumber(currency.marketCap)}$</p>
-                <p>Daily Change: {prettyNumber(currency.change)}%</p>
-              </Card>
-            </Link>
-          </Col>
-        ))}
+        {isFetching ? (
+          <LoadingSkeleton />
+        ) : (
+          cryptos?.map((currency) => (
+            <Col
+              xs={24}
+              sm={12}
+              lg={6}
+              className="crypto-card"
+              key={currency.uuid}
+            >
+              <Link to={`/crypto/${currency.uuid}`}>
+                <Card
+                  title={`${currency.rank}. ${currency.name}`}
+                  hoverable
+                  extra={
+                    <img className="crypto-image" src={currency.iconUrl} />
+                  }
+                >
+                  <p>Price: {prettyNumber(currency.price)}$</p>
+                  <p>Market Cap: {prettyNumber(currency.marketCap)}$</p>
+                  <p>
+                    Daily Change:{" "}
+                    <Text
+                      type={Number(currency.change) < 0 ? "danger" : "success"}
+                    >
+                      {prettyNumber(currency.change)}%
+                    </Text>
+                  </p>
+                </Card>
+              </Link>
+            </Col>
+          ))
+        )}
       </Row>
     </>
   );
